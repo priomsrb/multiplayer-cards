@@ -7,18 +7,33 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
+import java.io.IOException;
+
 /**
  * Created by Shafqat on 29/07/2014.
  */
 public class GameScreen implements Screen {
     public Array<Card> cards;
     private Stage stage;
+    public GameClient client;
+    public GameServer server;
 
-    public GameScreen() {
+    public GameScreen(boolean isServer) {
+        try {
+            if(isServer) {
+                server = new GameServer();
+            }
+            client = new GameClient(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         stage = new Stage(new StretchViewport(768, 1280));
         cards = new Array<Card>();
         for(int i = 0; i < 13; i++) {
             Card card = new Card(2, i + 1, 60 + i * 40, 100);
+            card.id = i;
+            card.client = client;
             cards.add(card);
             stage.addActor(card);
         }

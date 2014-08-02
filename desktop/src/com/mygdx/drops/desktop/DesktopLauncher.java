@@ -10,6 +10,6 @@ public class DesktopLauncher {
         config.title = "Cards";
         config.width = 480;
         config.height = 800;
-        new LwjglApplication(new CardGame(), config);
+        new LwjglApplication(new CardGame(arg), config);
 	}
 }

@@ -5,21 +5,26 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 
 /**
  * Created by Shafqat on 28/07/2014.
  */
 public class Card extends Actor {
+    public int id;
     public static Texture baseTexture;
     public final int rank;
     public final int suit;
     public TextureRegion texture;
     public Vector2 touchPos;
     public int touchedBy;
+    public GameClient client;
 
     public Card(int suit, int rank, float x, float y) {
         this.suit = suit;
@@ -47,6 +52,7 @@ public class Card extends Actor {
                 Card card = Card.this;
                 if (card.touchedBy == pointer) {
                     card.touchedBy = -1;
+                    client.sendMessage(new CardMoved(card.id, card.getX(), card.getY()));
                 }
             }
 
@@ -54,8 +60,9 @@ public class Card extends Actor {
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
                 Card card = Card.this;
                 if (card.touchedBy == pointer) {
-                    card.setX(card.getX() + x - card.touchPos.x);
-                    card.setY(card.getY() + y - card.touchPos.y);
+                    card.moveBy(x - card.touchPos.x,
+                                y - card.touchPos.y);
+                    client.sendUdpMessage(new CardMoved(card.id, card.getX(), card.getY()));
                 }
             }
         });
@@ -67,5 +74,17 @@ public class Card extends Actor {
         batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
         batch.draw(texture, getX(), getY(), getOriginX(), getOriginY(),
                 getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
+    }
+
+    public void receivedMessage(Message message) {
+        if(message instanceof CardMoved) {
+            CardMoved cardMoved = (CardMoved)message;
+            System.out.println(cardMoved);
+            MoveToAction action = new MoveToAction();
+            action.setPosition(cardMoved.x, cardMoved.y);
+            action.setDuration(0.3f);
+            action.setInterpolation(Interpolation.pow2Out);
+            addAction(action);
+        }
     }
 }
