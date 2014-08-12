@@ -6,17 +6,20 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
+import com.mygdx.drops.Messages.CardMoved;
+import com.mygdx.drops.Messages.Message;
+
+import java.util.Comparator;
 
 /**
  * Created by Shafqat on 28/07/2014.
  */
-public class Card extends Actor {
+public class Card extends Actor implements Comparable<Card> {
     public int id;
     public static Texture baseTexture;
     public final int rank;
@@ -78,13 +81,42 @@ public class Card extends Actor {
 
     public void receivedMessage(Message message) {
         if(message instanceof CardMoved) {
-            CardMoved cardMoved = (CardMoved)message;
-            System.out.println(cardMoved);
-            MoveToAction action = new MoveToAction();
-            action.setPosition(cardMoved.x, cardMoved.y);
-            action.setDuration(0.3f);
-            action.setInterpolation(Interpolation.pow2Out);
-            addAction(action);
+            toFront();
+            CardMoved cardMoved = (CardMoved) message;
+            // Flip X and Y to make it look like it came from the other side
+            float x = getStage().getWidth() - cardMoved.x - getWidth();
+            float y = getStage().getHeight() - cardMoved.y;
+            if(!isVisible()) {
+                setPosition(x, y);
+                setVisible(true);
+            } else {
+                MoveToAction action = new MoveToAction();
+                action.setPosition(x, y);
+                action.setDuration(0.3f);
+                action.setInterpolation(Interpolation.pow2Out);
+                addAction(action);
+            }
+        }
+    }
+
+    public void moveToCenter() {
+        setX(getStage().getWidth()/2 - getWidth()/2);
+        setY(getStage().getHeight() / 2 - getHeight() / 2);
+    }
+
+    /**
+     * Sort by suit then rank
+     */
+    @Override
+    public int compareTo(Card o) {
+        if(suit < o.suit) {
+            return -1;
+        } else if(suit == o.suit && rank < o.rank) {
+            return -1;
+        } else if(suit == o.suit && rank == o.rank) {
+            return 0;
+        } else {
+            return 1;
         }
     }
 }

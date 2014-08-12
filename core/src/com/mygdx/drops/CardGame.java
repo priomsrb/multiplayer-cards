@@ -7,6 +7,10 @@ public class CardGame extends Game {
     private String[] arg;
     private Screen screen;
 
+    public CardGame() {
+        this(new String[]{});
+    }
+
     public CardGame(String[] arg) {
         this.arg = arg;
     }

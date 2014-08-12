@@ -23,14 +23,17 @@ import java.io.IOException;
 public class MenuScreen implements Screen {
     private Game game;
     private Stage stage;
-    Skin skin;
 
     public MenuScreen(Game game) {
         this.game = game;
         stage = new Stage(new StretchViewport(768, 1280));
         Gdx.input.setInputProcessor(stage);
 
-        setupSkin();
+        setupGui();
+    }
+
+    private void setupGui() {
+        Skin skin = SkinFactory.getSkin();
 
         Table table = new Table();
         table.debug(); // turn on all debug lines (table, cell, and widget)
@@ -62,39 +65,6 @@ public class MenuScreen implements Screen {
                 MenuScreen.this.game.setScreen(new GameScreen(false));
             }
         });
-
-    }
-
-    private void setupSkin() {
-        skin = new Skin();
-
-        // Generate a 1x1 white texture and store it in the skin named "white".
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        skin.add("white", new Texture(pixmap));
-
-        // Store the default libgdx font under the name "default".
-        skin.add("default", new BitmapFont());
-
-        // Configure a TextButtonStyle and name it "default". Skin resources are stored by type, so this doesn't overwrite the font.
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-        textButtonStyle.font = skin.getFont("default");
-        textButtonStyle.font.setScale(3);
-        skin.add("default", textButtonStyle);
-
-        TextField.TextFieldStyle textFieldStyle = new TextField.TextFieldStyle();
-        textFieldStyle.background = skin.newDrawable("white", Color.DARK_GRAY);
-        textFieldStyle.focusedBackground = skin.newDrawable("white", Color.GRAY);
-        textFieldStyle.cursor = skin.newDrawable("white", Color.BLUE);
-        textFieldStyle.selection = skin.newDrawable("white", Color.BLUE);
-        textFieldStyle.fontColor = Color.WHITE;
-        textFieldStyle.font = skin.getFont("default");
-        textFieldStyle.font.setScale(3);
-        skin.add("default", textFieldStyle);
     }
 
     @Override
@@ -135,6 +105,6 @@ public class MenuScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-        skin.dispose();
+        SkinFactory.dispose();
     }
 }

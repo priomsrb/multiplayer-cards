@@ -3,9 +3,15 @@ package com.mygdx.drops;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.mygdx.drops.Messages.RequestShuffle;
 
 import java.io.IOException;
 
@@ -14,14 +20,16 @@ import java.io.IOException;
  */
 public class GameScreen implements Screen {
     public Array<Card> cards;
-    private Stage stage;
+    public Array<Card> cardsInHand;
+    public Stage stage;
     public GameClient client;
     public GameServer server;
+    public CardController cardController;
 
     public GameScreen(boolean isServer) {
         try {
             if(isServer) {
-                server = new GameServer();
+                server = new GameServer(this);
             }
             client = new GameClient(this);
         } catch (IOException e) {
@@ -29,16 +37,49 @@ public class GameScreen implements Screen {
         }
 
         stage = new Stage(new StretchViewport(768, 1280));
+        Gdx.input.setInputProcessor(stage);
+
+        setupCards();
+        setupGui();
+    }
+
+    private void setupCards() {
         cards = new Array<Card>();
-        for(int i = 0; i < 13; i++) {
-            Card card = new Card(2, i + 1, 60 + i * 40, 100);
+        cardsInHand = new Array<Card>();
+        for(int i = 0; i < 26; i++) {
+            int suit = i / 13 + 1;
+            int rank = i % 13 + 1;
+            Card card = new Card(suit, rank, 60 + i * 40, 100);
             card.id = i;
             card.client = client;
+            card.setVisible(false);
             cards.add(card);
             stage.addActor(card);
         }
+        cardController = new CardController(this);
+    }
 
-        Gdx.input.setInputProcessor(stage);
+    private void setupGui() {
+        Skin skin = SkinFactory.getSkin();
+
+        Table table = new Table();
+        table.debug(); // turn on all debug lines (table, cell, and widget)
+        table.setFillParent(true);
+        table.top();
+        stage.addActor(table);
+
+        TextButton shuffleButton = new TextButton("Shuffle", skin);
+        table.add(shuffleButton).pad(50);
+
+        shuffleButton.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                requestShuffle();
+            }
+        });
+    }
+
+    public void requestShuffle() {
+        client.sendMessage(new RequestShuffle());
     }
 
     @Override
@@ -81,5 +122,7 @@ public class GameScreen implements Screen {
             Card.baseTexture.dispose();
         }
         stage.dispose();
+        SkinFactory.dispose();
     }
+
 }

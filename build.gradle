@@ -84,7 +84,17 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "kryonet:kryonet-all:2.21"
+
+        testCompile(
+                ['org.testng:testng:6.8.8'],
+//            ['org.uncommons:reportng:1.1.4'],
+//            ['org.mockito:mockito-all:1.9.5'],
+//            ['org.easytesting:fest-assert-core:2.0M10'],
+// workaround for a known issue with TestNG 6.x: explicitly add Guice (Gradle will fail to run tests otherwise)
+                ['com.google.inject:guice:3.0']
+        )
     }
+
 }
 
 tasks.eclipse.doLast {
