@@ -3,9 +3,7 @@ package com.mygdx.drops;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.mygdx.drops.Messages.CardMoved;
-import com.mygdx.drops.Messages.CardsDealt;
-import com.mygdx.drops.Messages.PlayerIdRequest;
+import com.mygdx.drops.Messages.*;
 
 import java.io.IOException;
 
@@ -35,9 +33,14 @@ public class GameClient {
                     CardMoved message = (CardMoved)object;
                     Card card = GameClient.this.screen.cards.get(message.cardId);
                     card.receivedMessage(message);
+                } else if (object instanceof CardMovedToHand) {
+                    CardMovedToHand message = (CardMovedToHand)object;
+                    screen.cardController.cardMovedToOpponentHand(message.cardId);
                 } else if (object instanceof CardsDealt) {
                     CardsDealt message = (CardsDealt)object;
                     screen.cardController.dealCards(message.cardIds);
+                } else if (object instanceof DiscardCards) {
+                    screen.cardController.discardCards();
                 }
             }
         });

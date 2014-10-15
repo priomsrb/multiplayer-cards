@@ -3,19 +3,13 @@ package com.mygdx.drops;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-
-import java.io.IOException;
 
 /**
  * Created by Shafqat on 29/07/2014.
@@ -48,13 +42,26 @@ public class MenuScreen implements Screen {
         TextButton joinButton = new TextButton("Join Game", skin);
         table.add(joinButton);
         table.row().pad(10);
-        ClientServerHelper.host = "192.168.43.1";
+        ClientServerHelper.host = "127.0.0.1";
         final TextField ipAddressField = new TextField(ClientServerHelper.host, skin);
         table.add(ipAddressField).width(350);
 
+        Array<String> myIps = ClientServerHelper.getMyIpAddresses();
+        for(int i = 0; i < myIps.size; i++) {
+            table.row().pad(10);
+            String text;
+            if(i == 0) {
+                text = "My IP: " + myIps.get(i);
+            } else {
+                text = "My IP #" + (i + 1)  + ": " + myIps.get(i);
+            }
+            table.add(new Label(text, skin));
+        }
+
         hostButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                ClientServerHelper.host = "127.0.0.1";
+//                ClientServerHelper.host = "127.0.0.1";
+                ClientServerHelper.host = ipAddressField.getText();
                 MenuScreen.this.game.setScreen(new GameScreen(true));
             }
         });

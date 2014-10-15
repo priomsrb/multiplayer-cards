@@ -3,10 +3,7 @@ package com.mygdx.drops;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.mygdx.drops.Messages.CardMoved;
-import com.mygdx.drops.Messages.CardsDealt;
-import com.mygdx.drops.Messages.PlayerIdRequest;
-import com.mygdx.drops.Messages.RequestShuffle;
+import com.mygdx.drops.Messages.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,7 +37,7 @@ public class GameServer {
                         cardsDealt.cardIds = cardHands.get(i);
                         server.getConnections()[i].sendTCP(cardsDealt);
                     }
-                } else if (object instanceof CardMoved) {
+                } else if (object instanceof P2PMessage) {
                     server.sendToAllExceptTCP(connection.getID(), object);
                 }
             }

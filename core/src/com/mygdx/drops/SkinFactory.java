@@ -4,9 +4,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
  * Created by Shafqat on 3/08/2014.
@@ -47,6 +48,12 @@ public class SkinFactory {
             textFieldStyle.font = skin.getFont("default");
             textFieldStyle.font.setScale(3);
             skin.add("default", textFieldStyle);
+
+            Label.LabelStyle labelStyle = new Label.LabelStyle();
+            labelStyle.font = new BitmapFont();
+            labelStyle.font.setScale(3);
+            labelStyle.fontColor = Color.WHITE;
+            skin.add("default", labelStyle);
         }
         return skin;
     }
@@ -54,5 +61,23 @@ public class SkinFactory {
     public static void dispose() {
         skin.dispose();
         skin = null;
+    }
+
+    public static ImageButton.ImageButtonStyle getButtonStyle(String upTexture, String downTexture, String overTexture) {
+        Drawable defaultDrawable = getDrawable(upTexture);
+        Drawable overDrawable = getDrawable(overTexture);
+        Drawable downDrawable = getDrawable(downTexture);
+        ImageButton.ImageButtonStyle buttonStyle = new ImageButton.ImageButtonStyle();
+        buttonStyle.imageUp = defaultDrawable;
+        buttonStyle.imageOver = overDrawable;
+        buttonStyle.imageDown = downDrawable;
+
+        return buttonStyle;
+    }
+
+    private static Drawable getDrawable(String textureFilename) {
+        Texture texture = new Texture(textureFilename);
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        return new TextureRegionDrawable(new TextureRegion(texture));
     }
 }

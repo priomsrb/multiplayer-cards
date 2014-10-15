@@ -3,7 +3,7 @@ package com.mygdx.drops.Messages;
 /**
  * Created by Shafqat on 30/07/2014.
  */
-public class CardMoved extends Message {
+public class CardMoved extends P2PMessage {
     public int cardId;
     public float x, y;
 
